@@ -30,22 +30,22 @@
     return typeof component.prototype === 'undefined'
   }
 
-  const props: ModalsProps = $props()
+  const { context = modals, ...props }: ModalsProps = $props()
 </script>
 
-{#if modals.stack.length > 0}
-  {@render props.backdrop?.(modals)}
+{#if context.stack.length > 0}
+  {@render props.backdrop?.(context)}
 {/if}
 
-{#each modals.stack as m, i (m.id)}
+{#each context.stack as m, i (m.id)}
   <StackedModalContext modal={m}>
     <!-- lazy modal -->
     {#if isLazyModal(m.component)}
       {#await m.component()}
-        {@render props.loading?.(modals)}
+        {@render props.loading?.(context)}
       {:then component}
         {#if props.modal}
-          {@render props.modal({ component: component.default, props: m.props }, modals)}
+          {@render props.modal({ component: component.default, props: m.props }, context)}
         {:else}
           <component.default {...m.props} />
         {/if}
@@ -53,7 +53,7 @@
     {:else}
       <!-- normal modal -->
       {#if props.modal}
-        {@render props.modal({ component: m.component, props: m.props }, modals)}
+        {@render props.modal({ component: m.component, props: m.props }, context)}
       {:else}
         <m.component {...m.props} />
       {/if}
